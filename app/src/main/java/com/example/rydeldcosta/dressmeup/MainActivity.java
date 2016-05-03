@@ -15,16 +15,18 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import com.facebook.FacebookSdk;
 
 public class MainActivity extends AppCompatActivity {
 
     private int PICK_IMAGE=1;
     Bitmap returndecoded;
-
+    Uri glob;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FacebookSdk.sdkInitialize(getApplicationContext());
     }
     public void gallery(View v)
     {
@@ -52,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String encoded = "";
-            Uri PhotoUri = data.getData();
+            Uri PhotoUri = data.getData();          //store this data as a key to each uri
+            glob = data.getData();
             try {
                 InputStream is = getContentResolver().openInputStream(PhotoUri);
                 Bitmap yourBitmap = BitmapFactory.decodeStream(is);
@@ -78,6 +81,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+    public void sendWA(View v)
+    {
+        ImageView img= (ImageView) findViewById(R.id.display_pic);
+        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+        Uri uri=glob;
+        whatsappIntent.setType("image/*");
+        whatsappIntent.setPackage("com.whatsapp");
+        whatsappIntent.putExtra(Intent.EXTRA_STREAM,uri);
+        try {
+            startActivity(whatsappIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+
+        }
     }
 
 
