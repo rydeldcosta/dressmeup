@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,9 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-        /*Profile p = Profile.getCurrentProfile();
+        Profile p = Profile.getCurrentProfile();
         if(p!=null) {
             System.out.print("Onsuccess");
             TextView t = (TextView) findViewById(R.id.profile_name);
@@ -115,8 +119,49 @@ public class MainActivity extends AppCompatActivity {
             t.setText("Welcome" + p.getName());
         }
         else
-            System.out.println("Null profile3");*/
+            System.out.println("Null profile3");
 
+
+
+
+    }
+    public  void takescreenshot(View v)
+    {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+            // image naming and path  to include sd card  appending name you choose for file
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + "test" + ".jpg";
+
+            // create bitmap screen capture
+            View v1 = getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+            openScreenshot(imageFile);
+        } catch (Throwable e) {
+            // Several error may come out with file handling or OOM
+            e.printStackTrace();
+        }
+
+    }
+
+    private void openScreenshot(File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);
     }
     public static Bitmap decodeBase64(String input) {
         byte[] decodedByte = Base64.decode(input, Base64.URL_SAFE);

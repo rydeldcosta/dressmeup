@@ -58,4 +58,14 @@
         android:layout_alignLeft="@+id/send"
         android:layout_alignStart="@+id/send" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Screenshot"
+        android:id="@+id/screenshot"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/send"
+        android:layout_alignStart="@+id/send"
+        android:onClick="takescreenshot" />
+
 </RelativeLayout>
