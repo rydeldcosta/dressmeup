@@ -23,13 +23,19 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,16 +59,28 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(LoginResult loginResult) {
+                AccessToken accessToken = loginResult.getAccessToken();
 
-                /*Profile p = Profile.getCurrentProfile();
-                if(p!=null) {
-                    System.out.print("Onsuccess");
-                    TextView t = (TextView) findViewById(R.id.profile_name);
-                    System.out.print(p.getName());
-                    t.setText("Welcome" + p.getName());
-                }
-                else
-                    System.out.println("Null profile");*/
+
+
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                try {
+                                    TextView t = (TextView) findViewById(R.id.profile_name);
+                                    //System.out.print(p.getName());
+                                    //t.setText("Welcome" + accessToken.getUserId());
+                                    t.setText("Hi, " + object.getString("name"));
+                                } catch(JSONException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender, birthday");
+                request.setParameters(parameters);
+                request.executeAsync();
 
 
             }
@@ -85,11 +103,11 @@ public class MainActivity extends AppCompatActivity {
     }
     public void gallery(View v)
     {
-        /*Intent intent = new Intent();
+        Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);*/
-        Profile p = Profile.getCurrentProfile();
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+        /*Profile p = Profile.getCurrentProfile();
         if(p!=null) {
             System.out.print("Onsuccess");
             TextView t = (TextView) findViewById(R.id.profile_name);
@@ -97,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             t.setText("Welcome" + p.getName());
         }
         else
-            System.out.println("Null profile3");
+            System.out.println("Null profile3");*/
 
     }
     public static Bitmap decodeBase64(String input) {
@@ -116,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /*if (requestCode == 1 && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             String encoded = "";
             Uri PhotoUri = data.getData();          //store this data as a key to each uri
             glob = data.getData();
@@ -144,19 +162,12 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        else*/
-        super.onActivityResult(requestCode, resultCode, data);
-            callbackManager.onActivityResult(requestCode, resultCode, data);
-        Profile p = Profile.getCurrentProfile();
-        if(p!=null) {
-            System.out.print("Onsuccess");
-            TextView t = (TextView) findViewById(R.id.profile_name);
-            System.out.print(p.getName());
-            t.setText("Welcome" + p.getName());
-        }
         else
-            System.out.println("Null profile2");
-        System.out.println("OnActRes");
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+
 
     }
     public void sendWA(View v)
