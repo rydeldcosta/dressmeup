@@ -1,6 +1,9 @@
 package com.example.rydeldcosta.dressmeup;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,31 +12,92 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 public class MainActivity extends AppCompatActivity {
 
     private int PICK_IMAGE=1;
     Bitmap returndecoded;
+    CallbackManager callbackManager;
     Uri glob;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        setContentView(R.layout.activity_main);
+        System.out.println("Oncreate");
+        LoginButton lg  = (LoginButton) findViewById(R.id.login_button);
+
+        lg.setReadPermissions("public_profile","email");
+        lg.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+
+                /*Profile p = Profile.getCurrentProfile();
+                if(p!=null) {
+                    System.out.print("Onsuccess");
+                    TextView t = (TextView) findViewById(R.id.profile_name);
+                    System.out.print(p.getName());
+                    t.setText("Welcome" + p.getName());
+                }
+                else
+                    System.out.println("Null profile");*/
+
+
+            }
+
+            @Override
+            public void onCancel() {
+                System.out.print("Oncancel");
+
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                System.out.print("Onerror");
+                TextView t = (TextView)findViewById(R.id.profile_name);
+                t.setText("error");
+            }
+        });
+
+
     }
     public void gallery(View v)
     {
-        Intent intent = new Intent();
+        /*Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);*/
+        Profile p = Profile.getCurrentProfile();
+        if(p!=null) {
+            System.out.print("Onsuccess");
+            TextView t = (TextView) findViewById(R.id.profile_name);
+            System.out.print(p.getName());
+            t.setText("Welcome" + p.getName());
+        }
+        else
+            System.out.println("Null profile3");
 
     }
     public static Bitmap decodeBase64(String input) {
@@ -52,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
+        /*if (requestCode == 1 && resultCode == RESULT_OK) {
             String encoded = "";
             Uri PhotoUri = data.getData();          //store this data as a key to each uri
             glob = data.getData();
@@ -80,7 +144,20 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+        else*/
         super.onActivityResult(requestCode, resultCode, data);
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        Profile p = Profile.getCurrentProfile();
+        if(p!=null) {
+            System.out.print("Onsuccess");
+            TextView t = (TextView) findViewById(R.id.profile_name);
+            System.out.print(p.getName());
+            t.setText("Welcome" + p.getName());
+        }
+        else
+            System.out.println("Null profile2");
+        System.out.println("OnActRes");
+
     }
     public void sendWA(View v)
     {
