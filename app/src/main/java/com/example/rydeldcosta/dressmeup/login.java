@@ -1,6 +1,7 @@
 package com.example.rydeldcosta.dressmeup;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -31,6 +32,10 @@ public class login extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_login);
+        String fontpath = "Fonts/makefunofmeDEMO.otf";
+        TextView name1 = (TextView) findViewById(R.id.wtwt);
+        Typeface tf = Typeface.createFromAsset(getAssets(), fontpath);
+        name1.setTypeface(tf);
         setupLogin();
     }
 
@@ -82,7 +87,7 @@ public class login extends AppCompatActivity {
 
             @Override
             public void onError(FacebookException e) {
-                Toast.makeText(getApplicationContext(),"CHeck you internet connection",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Check you internet connection",Toast.LENGTH_LONG).show();
             }
         });
     }

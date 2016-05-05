@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
         Bundle b = i.getBundleExtra("BUNDLE");
         String id = b.getString("id");
         String name = b.getString("name");
-        Profile p = Profile.getCurrentProfile();
-        t.setText("Hi, "+ name + " Your id is : " + p.getId());
+       // Profile p = Profile.getCurrentProfile();
+        t.setText("Hi, "+ name);
     }
 
     public void gallery(View v)
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // image naming and path  to include sd card  appending name you choose for file
-            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + "test" + ".jpg";
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
 
             // create bitmap screen capture
             View v1 = getWindow().getDecorView().getRootView();
@@ -112,8 +112,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void shareScreenshot(File imageFile) {
+
         Intent whatsappIntent = new Intent();
-        whatsappIntent.setAction(Intent.ACTION_VIEW);
+        whatsappIntent.setAction(Intent.ACTION_SEND);
         Uri uri = Uri.fromFile(imageFile);
         whatsappIntent.setType("image/*");
         whatsappIntent.setPackage("com.whatsapp");

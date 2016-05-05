@@ -33,8 +33,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/display_pic"
             android:layout_below="@+id/profile_name"
+            android:layout_above="@+id/button_pick"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="125dp" />
+            android:layout_marginTop="20dp" />
 
         <Button
             android:layout_width="250dp"
