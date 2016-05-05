@@ -52,77 +52,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
+        //FacebookSdk.sdkInitialize(getApplicationContext());
+
         setContentView(R.layout.activity_main);
-        System.out.println("Oncreate");
-        LoginButton lg  = (LoginButton) findViewById(R.id.login_button);
+        //System.out.println("Oncreate");
+        setupDetails();
 
-        lg.setReadPermissions("public_profile","email");
-        lg.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                AccessToken accessToken = loginResult.getAccessToken();
-
-
-
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                try {
-                                    TextView t = (TextView) findViewById(R.id.profile_name);
-                                    //System.out.print(p.getName());
-                                    //t.setText("Welcome" + accessToken.getUserId());
-                                    t.setText("Hi, " + object.getString("name"));
-                                } catch(JSONException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,email,gender, birthday");
-                request.setParameters(parameters);
-                request.executeAsync();
-
-
-            }
-
-            @Override
-            public void onCancel() {
-                System.out.print("Oncancel");
-
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-                System.out.print("Onerror");
-                TextView t = (TextView)findViewById(R.id.profile_name);
-                t.setText("error");
-            }
-        });
 
 
     }
+
+    private void setupDetails() {
+        TextView t = (TextView) findViewById(R.id.profile_name);
+        Intent i = getIntent();
+        Bundle b = i.getBundleExtra("BUNDLE");
+        String id = b.getString("id");
+        String name = b.getString("name");
+        Profile p = Profile.getCurrentProfile();
+        t.setText("Hi, "+ name + " Your id is : " + p.getId());
+    }
+
     public void gallery(View v)
     {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-        Profile p = Profile.getCurrentProfile();
-        if(p!=null) {
-            System.out.print("Onsuccess");
-            TextView t = (TextView) findViewById(R.id.profile_name);
-            System.out.print(p.getName());
-            t.setText("Welcome" + p.getName());
-        }
-        else
-            System.out.println("Null profile3");
-
-
-
 
     }
     public  void takescreenshot(View v)
@@ -148,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             outputStream.flush();
             outputStream.close();
 
-            openScreenshot(imageFile);
+            shareScreenshot(imageFile);
         } catch (Throwable e) {
             // Several error may come out with file handling or OOM
             e.printStackTrace();
@@ -156,12 +111,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void openScreenshot(File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
+    private void shareScreenshot(File imageFile) {
+        Intent whatsappIntent = new Intent();
+        whatsappIntent.setAction(Intent.ACTION_VIEW);
         Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
-        startActivity(intent);
+        whatsappIntent.setType("image/*");
+        whatsappIntent.setPackage("com.whatsapp");
+        //whatsappIntent.putExtra(Intent.EXTRA_TEXT,"Check this out!");
+        whatsappIntent.putExtra(Intent.EXTRA_STREAM,uri);
+        try {
+            startActivity(whatsappIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(getApplicationContext(),"Whatsapp not installed",Toast.LENGTH_LONG).show();
+
+        }
     }
     public static Bitmap decodeBase64(String input) {
         byte[] decodedByte = Base64.decode(input, Base64.URL_SAFE);
@@ -207,28 +170,14 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        else
-            callbackManager.onActivityResult(requestCode, resultCode, data);
+
 
         super.onActivityResult(requestCode, resultCode, data);
 
 
 
     }
-    public void sendWA(View v)
-    {
-        ImageView img= (ImageView) findViewById(R.id.display_pic);
-        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
-        Uri uri=glob;
-        whatsappIntent.setType("image/*");
-        whatsappIntent.setPackage("com.whatsapp");
-        whatsappIntent.putExtra(Intent.EXTRA_STREAM,uri);
-        try {
-            startActivity(whatsappIntent);
-        } catch (android.content.ActivityNotFoundException ex) {
 
-        }
-    }
 
 
 }
